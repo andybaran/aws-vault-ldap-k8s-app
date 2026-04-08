@@ -28,10 +28,10 @@ deployment "development" {
     ldap_dual_account            = upstream_input.vault_stack.ldap_dual_account
     grace_period                 = upstream_input.vault_stack.grace_period
     vault_app_auth_role          = try(upstream_input.vault_stack.vault_app_auth_role_name, "")
-    vault_agent_auth_role_name   = try(upstream_input.vault_stack.vault_agent_auth_role_name, "vault-agent-app-role")
-    vault_agent_static_role_name = try(upstream_input.vault_stack.vault_agent_static_role_name, "vault-agent-dual-role")
-    csi_auth_role_name           = try(upstream_input.vault_stack.csi_auth_role_name, "csi-app-role")
-    csi_static_role_name         = try(upstream_input.vault_stack.csi_static_role_name, "csi-dual-role")
+    vault_agent_auth_role_name   = "vault-agent-app-role"
+    vault_agent_static_role_name = "vault-agent-dual-role"
+    csi_auth_role_name           = "csi-app-role"
+    csi_static_role_name         = "csi-dual-role"
 
     ldap_app_image        = "ghcr.io/andybaran/vault-ldap-demo:latest"
     ldap_app_account_name = "svc-rotate-a"
