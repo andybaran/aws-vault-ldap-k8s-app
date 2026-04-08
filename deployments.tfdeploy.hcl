@@ -5,12 +5,12 @@ store varset "aws_creds" {
 
 upstream_input "k8s_stack" {
   type   = "stack"
-  source = "app.terraform.io/andybaran/ldap-stack/aws-vault-ldap-k8s-k8s"
+  source = "app.terraform.io/andybaran/ldap stack/aws-vault-ldap-k8s-k8s"
 }
 
 upstream_input "vault_stack" {
   type   = "stack"
-  source = "app.terraform.io/andybaran/ldap-stack/aws-vault-ldap-k8s-vault"
+  source = "app.terraform.io/andybaran/ldap stack/aws-vault-ldap-k8s-vault"
 }
 
 deployment "development" {
