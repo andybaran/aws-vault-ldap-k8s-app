@@ -39,7 +39,7 @@ resource "kubernetes_config_map_v1" "vault_agent_config" {
         method "kubernetes" {
           mount_path = "auth/kubernetes"
           config = {
-            role       = var.vault_agent_auth_role_name
+            role       = "${var.vault_agent_auth_role_name}"
             token_path = "/var/run/secrets/vault/token"
           }
         }
@@ -88,7 +88,7 @@ resource "kubernetes_config_map_v1" "vault_agent_config" {
         method "kubernetes" {
           mount_path = "auth/kubernetes"
           config = {
-            role       = var.vault_agent_auth_role_name
+            role       = "${var.vault_agent_auth_role_name}"
             token_path = "/var/run/secrets/vault/token"
           }
         }
