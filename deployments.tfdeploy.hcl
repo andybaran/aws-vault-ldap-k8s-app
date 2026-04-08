@@ -22,7 +22,7 @@ deployment "development" {
     kube_cluster_certificate_authority_data = upstream_input.k8s_stack.cluster_ca_data
     eks_cluster_name                        = try(upstream_input.k8s_stack.cluster_name, upstream_input.k8s_stack.cluster_id)
 
-    ldap_mount_path              = try(upstream_input.vault_stack.ldap_secrets_mount_path, "ldap")
+    ldap_mount_path              = try(upstream_input.vault_stack.ldap_mount_path, upstream_input.vault_stack.ldap_secrets_mount_path, "ldap")
     vso_vault_auth_name          = try(upstream_input.vault_stack.vso_vault_auth_name, "default")
     static_role_rotation_period  = upstream_input.vault_stack.static_role_rotation_period
     ldap_dual_account            = upstream_input.vault_stack.ldap_dual_account
