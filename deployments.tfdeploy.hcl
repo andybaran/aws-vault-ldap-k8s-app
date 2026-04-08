@@ -41,3 +41,23 @@ deployment "development" {
     AWS_SESSION_TOKEN     = store.varset.aws_creds.AWS_SESSION_TOKEN
   }
 }
+
+publish_output "ldap_static_role_name" {
+  value = deployment.development.ldap_static_role_name
+}
+
+publish_output "ldap_app_service_name" {
+  value = deployment.development.ldap_app_service_name
+}
+
+publish_output "ldap_app_url" {
+  value = deployment.development.ldap_app_url
+}
+
+publish_output "ldap_app_vault_agent_url" {
+  value = deployment.development.ldap_app_vault_agent_url
+}
+
+publish_output "ldap_app_csi_url" {
+  value = deployment.development.ldap_app_csi_url
+}
