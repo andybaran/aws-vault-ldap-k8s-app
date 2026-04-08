@@ -1,45 +1,72 @@
 # aws-vault-ldap-k8s-app
 
-Terraform Cloud Stacks scaffold for the application slice of the `aws-vault-ldap-k8s` demo.
+Terraform Cloud Stacks repo for the application slice of the `aws-vault-ldap-k8s` demo.
 
-This repository is intended to own the demo workload that proves the end-to-end flow: Vault rotates Active Directory credentials and the application receives them on Kubernetes. It should stay focused on the app deployment and app-facing secret-delivery integration points.
+This repository owns the Kubernetes workload that proves the end-to-end flow: Vault rotates Active Directory credentials and the demo application receives them on EKS. It intentionally does not own the Python image build or image pipeline; the application image continues to come from the source repository.
 
 ## Stack purpose
 
-- deploy the demo application workload on the shared Kubernetes platform
-- consume Vault-delivered LDAP credential contracts from the Vault stack
-- publish app access metadata and smoke-test outputs when useful
+- deploy the demo LDAP application workload onto the shared EKS platform
+- consume Vault-linked LDAP delivery metadata from the Vault stack
+- derive EKS authentication locally from AWS instead of depending on a published upstream auth token
+- expose useful human-facing app outputs such as service names and URLs
+
+## Repository layout
+
+- `modules/ldap_app` - copied from the source repo and kept focused on app-facing Kubernetes resources
+- `modules/eks_auth` - small helper module that derives an EKS auth token via the AWS provider
+- `components.tfcomponent.hcl` - component graph and split-repo app wiring
+- `providers.tfcomponent.hcl` - AWS and Kubernetes provider configuration for the stack
+- `variables.tfcomponent.hcl` - deployment inputs for app, EKS, Vault, and AWS credentials
+- `outputs.tfcomponent.hcl` - useful app deployment outputs
+- `deployments.tfdeploy.hcl` - linked-stack dependencies, shared varset usage, and the demo deployment
 
 ## Upstream linked-stack contract
 
-Current scaffold assumption: this stack will consume linked-stack outputs from both `aws-vault-ldap-k8s-k8s` and `aws-vault-ldap-k8s-vault`.
+This stack depends on the following Terraform Cloud Stacks:
 
-Planned upstream inputs from `aws-vault-ldap-k8s-k8s`:
+- `app.terraform.io/andybaran/ldap-stack/aws-vault-ldap-k8s-k8s`
+- `app.terraform.io/andybaran/ldap-stack/aws-vault-ldap-k8s-vault`
 
-- Kubernetes namespace, ingress, and general workload placement metadata
-- cluster-level details needed for app deployment resources
+Expected inputs from the k8s stack:
 
-Planned upstream inputs from `aws-vault-ldap-k8s-vault`:
+- `cluster_endpoint`
+- `cluster_ca_data`
+- `cluster_name` (with `cluster_id` also available if needed)
+- `kube_namespace`
+- `region`
 
-- Vault auth role and connection metadata
-- LDAP secrets engine mount path and role names
-- delivery-mode-specific secret reference metadata
+Expected inputs from the vault stack:
 
-## Downstream linked-stack contract
+- `ldap_secrets_mount_path`
+- `vso_vault_auth_name`
+- `vault_app_auth_role_name`
+- `ldap_dual_account`
+- `grace_period`
+- `static_role_rotation_period`
+- optionally `vault_agent_auth_role_name`
+- optionally `vault_agent_static_role_name`
+- optionally `csi_auth_role_name`
+- optionally `csi_static_role_name`
 
-This stack is not expected to be a required upstream for another stack. It may still publish useful outputs such as:
+## Demo defaults preserved from the source repo
 
-- service names and ingress/load balancer URLs
-- health endpoint or smoke-test metadata
-- app mode details that help validate the demo end to end
+- `ldap_app_image = ghcr.io/andybaran/vault-ldap-demo:latest`
+- `ldap_app_account_name = svc-rotate-a`
+- `ldap_static_role_name = dual-rotation-demo` when dual-account mode is enabled; otherwise it uses `ldap_app_account_name`
+- `ldap_dual_account`, `grace_period`, and `static_role_rotation_period` are consumed from the Vault stack
+- Vault Agent and CSI role names fall back to the source demo defaults until the Vault stack publishes explicit outputs for them
 
-## Terraform Cloud Stacks
+The development deployment uses the shared AWS credentials varset `varset-oUu39eyQUoDbmxE1`.
 
-This repo is scaffolded around Terraform Stacks root files:
+## Downstream contract
 
-- `components.tfcomponent.hcl`
-- `providers.tfcomponent.hcl`
-- `variables.tfcomponent.hcl`
-- `deployments.tfdeploy.hcl`
+This stack has no required downstream linked-stack consumers. It keeps regular stack outputs for operators, but it does not publish linked-stack outputs by default.
 
-The HCL files are placeholders only. Later todos should add the actual application components and linked-stack wiring.
+## Local validation
+
+```bash
+terraform stacks fmt
+terraform stacks init
+terraform stacks validate
+```
